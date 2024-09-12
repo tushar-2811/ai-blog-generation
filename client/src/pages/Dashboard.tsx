@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import Input from "../components/Input"
 import axios from "axios"
 import Markdown from 'react-markdown'
+import clsx from "clsx"
 
 
 const Dashboard = () => {
@@ -13,6 +14,7 @@ const Dashboard = () => {
         terminology : "",
         writingStyle : ""
     })
+    const[dataLoaded , setDataLoaded] = useState(false);
     const[isLoading , setIsLoading] = useState(false);
     
     const [content , setContent] = useState("");
@@ -34,7 +36,22 @@ const Dashboard = () => {
         console.log(response.data)
         setContent(response.data.text);
         setIsLoading(false);
+        setDataLoaded(true)
     }
+
+    const handleeDownload = () => {
+        downloadTextFile(content, 'filename.txt');
+    }
+
+    const downloadTextFile = (text:any, filename:any) => {
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
 
     const onChange = (e:any) => {
         setData(prev => ({
@@ -87,9 +104,13 @@ const Dashboard = () => {
                         {
                             isLoading ? <div className="flex justify-center items-center">
                                 Loading...
-                            </div> :  <Markdown>
+                            </div> : <div>
+                            <Markdown>
                             {content}
                           </Markdown>
+                          <br />
+                          <button  onClick={handleeDownload} className={`bg-black text-white px-4 py-2 rounded-xl ${dataLoaded ? 'block' : 'hidden'}`}>Download</button>
+                            </div>
                         }
                        </h3>
                 </div>
