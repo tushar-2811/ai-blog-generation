@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import DashboardHeader from "../components/DashboardHeader"
 import { useNavigate } from "react-router-dom"
 import Input from "../components/Input"
+import axios from "axios"
+import Markdown from 'react-markdown'
 
 
 const Dashboard = () => {
@@ -11,12 +13,27 @@ const Dashboard = () => {
         terminology : "",
         writingStyle : ""
     })
+    const[isLoading , setIsLoading] = useState(false);
     
     const [content , setContent] = useState("");
     const navigate = useNavigate();
 
-    const handleSubmit = () => {
-        console.log(data)
+    const handleSubmit = async() => {
+        setIsLoading(true);
+        // console.log(data)
+        const response = await axios.post("http://127.0.0.1:5000/generate" , {
+             topic : data.topic,
+             keywords : data.keywords,
+             terminology : data.terminology,
+             writing_style : data.writingStyle
+            },
+            {
+                headers: {
+                  'Content-Type': 'application/json',
+       }   });
+        console.log(response.data)
+        setContent(response.data.text);
+        setIsLoading(false);
     }
 
     const onChange = (e:any) => {
@@ -37,7 +54,7 @@ const Dashboard = () => {
             <DashboardHeader />
             <div className="grid grid-cols-12">
 
-                <div className="col-span-6 mt-6 py-8 border-r-2 items-center border-black">
+                <div className="col-span-6 overflow-hidden  mt-6 py-8 border-r-2 items-center border-black">
                     <h1 className="text-3xl bg-gradient-to-r from-pink-400 to-sky-400 text-transparent bg-clip-text p-4 text-center">Start Creating Content</h1>
                     <div className="flex flex-col gap-4">
                         <div className="form-group">
@@ -64,8 +81,17 @@ const Dashboard = () => {
 
                 </div>
 
-                <div className="col-span-6">
-
+                <div className="col-span-6 p-6 text-md items-center overflow-scroll">
+                    <h1 className="text-center text-2xl font-bold"></h1>
+                       <h3 className="tracking-tighter mt-8 ">
+                        {
+                            isLoading ? <div className="flex justify-center items-center">
+                                Loading...
+                            </div> :  <Markdown>
+                            {content}
+                          </Markdown>
+                        }
+                       </h3>
                 </div>
     
 

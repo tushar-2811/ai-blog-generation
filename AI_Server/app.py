@@ -30,7 +30,8 @@ def generate():
     prompt = (f"Write a story on the topic of '{topic}'. "
               f"Include the following keywords: {keywords}. "
               f"Use the following terminology: {terminology}. "
-              f"Write in the style of {writing_style}.")
+              f"Write in the style of {writing_style}."
+              f"with heading")
 
     model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
